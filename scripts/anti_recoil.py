@@ -2,7 +2,7 @@
 # scripts/anti_recoil.py
 
 # القوة الافتراضية (تقدر تغيرها من الواجهة)
-RECOIL_STRENGTH = 0.12
+RECOIL_STRENGTH = 1.30
 
 def process(state: dict) -> dict:
     global RECOIL_STRENGTH

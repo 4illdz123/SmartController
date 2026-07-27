@@ -1,5 +1,3 @@
-# core/script_engine.py
-
 import os
 import importlib.util
 import time
@@ -7,7 +5,7 @@ import time
 class ScriptEngine:
     def __init__(self, scripts_folder="scripts"):
         self.scripts_folder = scripts_folder
-        self.loaded_scripts = {}  # name -> module
+        self.loaded_scripts = {}   # name -> module
         self.enabled_scripts = set()  # أسماء السكربتات المفعلة
         self.load_all_scripts()
 
@@ -31,7 +29,8 @@ class ScriptEngine:
             return False
 
         try:
-            spec = importlib.util.spec_from_file_location(script_name, path)
+            # استخدام اسم فريد بالكامل للموديل حتى يسهل للذاكرة إعادة استيراده (Hot Reload)
+            spec = importlib.util.spec_from_file_location(f"scripts.{script_name}", path)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
@@ -45,6 +44,29 @@ class ScriptEngine:
         except Exception as e:
             print(f"[ScriptEngine] خطأ في تحميل {script_name}: {e}")
             return False
+
+    def reload_script(self, script_name: str):
+        """إعادة تحميل (Hot-Reload) لسكربت معين بعد تعديل كوده من الواجهة"""
+        print(f"[ScriptEngine] جاري إعادة تحميل السكربت: {script_name}...")
+        
+        # حفظ حالة التفعيل السابقة (إذا كان مفعل أو متوقف)
+        was_enabled = script_name in self.enabled_scripts
+        
+        # إعادة التحميل
+        success = self.load_script(script_name)
+        
+        if success and was_enabled:
+            self.enabled_scripts.add(script_name)
+            
+        return success
+
+    def reload_all_scripts(self):
+        """إعادة تحميل كافة السكربتات"""
+        currently_enabled = set(self.enabled_scripts)
+        self.loaded_scripts.clear()
+        self.load_all_scripts()
+        # إعادة التفعيل للسكربتات التي كانت مفعلة
+        self.enabled_scripts = currently_enabled.intersection(set(self.loaded_scripts.keys()))
 
     def enable(self, script_name: str):
         if script_name in self.loaded_scripts:
