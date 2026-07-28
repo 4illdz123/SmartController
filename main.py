@@ -1,5 +1,3 @@
-# main.py
-
 import flet as ft
 from ui.main_window import main
 

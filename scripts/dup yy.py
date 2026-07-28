@@ -1,22 +1,27 @@
-def process(state: dict) -> dict:
-    if 'l3_pressed' not in state:
-        state['l3_pressed'] = False
-        state['y_pressed_time'] = 0
-
-    if state['buttons']['l3'] and not state['l3_pressed']:
-        state['l3_pressed'] = True
-        state['y_pressed_time'] = 0
-    elif not state['buttons']['l3'] and state['l3_pressed']:
-        state['l3_pressed'] = False
-
-    if state['l3_pressed']:
-        state['y_pressed_time'] += 1 / 60  #假设帧率为60
-        if state['y_pressed_time'] < 0.5:
-            state['buttons']['y'] = True
-        else:
-            state['buttons']['y'] = False
-        if state['y_pressed_time'] >= 1:
-            state['y_pressed_time'] = 0
-            state['buttons']['y'] = False
-
+# scripts/double_yy.py
+
+import time
+
+def process(state: dict) -> dict:
+    if "_yy_last" not in state:
+        state["_yy_last"] = 0.0
+        state["_yy_on"] = False
+
+    buttons = state.get("buttons", {})
+    l3 = buttons.get("l3", False)
+
+    if l3:
+        now = time.time()
+
+        # كل 0.05 ثانية يغير حالة الزر
+        if now - state["_yy_last"] >= 0.05:
+            state["_yy_on"] = not state["_yy_on"]
+            state["_yy_last"] = now
+
+        buttons["triangle"] = state["_yy_on"]
+    else:
+        state["_yy_on"] = False
+        state["_yy_last"] = 0.0
+
+    state["buttons"] = buttons
     return state
