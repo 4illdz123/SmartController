@@ -1,23 +1,47 @@
 import time
 
-def process(state: dict) -> dict:
-    if "_double_way" not in state:
-        state["_double_way"] = False
-        state["_last_toggle"] = time.time()
-        state["_count"] = 0
+last_press_time = 0.0
+yy_stage = 0
 
-    # يشتغل فقط بالضغطة الواحدة على L3
-    if state.get("l3", False):
-        now = time.time()
-        if now - state["_last_toggle"] > 0.4:
-            state["_count"] += 1
-            if state["_count"] <= 6:  # 3 دورات كاملة
-                state["right_x"] = 0.0 if state["_double_way"] else -1.0
-                state["_double_way"] = not state["_double_way"]
-            else:
-                state["right_x"] = 0.0
-                state["_count"] = 0
-                state["_double_way"] = False
-            state["_last_toggle"] = now
+def process(state: dict) -> dict:
+    global last_press_time, yy_stage
+    
+    current_time = time.time()
+    
+    # فحص هل زر L3 مضغوط حالياً
+    l3_pressed = state.get('L3', 0) > 0 or state.get('L_THUMB', 0) > 0
+
+    # إذا رفع المستخدم إصبعه عن L3، قم بإلغاء التكرار فوراً
+    if not l3_pressed:
+        yy_stage = 0
+        return state
+
+    # إذا كان L3 مضغوطاً وابتدأت الدورة أو انتهت، ابدأ دورة YY جديدة
+    if yy_stage == 0:
+        yy_stage = 1
+        last_press_time = current_time
+
+    # المرحلة 1: ضغط Y الأولى
+    if yy_stage == 1:
+        state['Y'] = 1
+        state['TRIANGLE'] = 1
+        if current_time - last_press_time >= 0.04:
+            yy_stage = 2
+            last_press_time = current_time
+
+    # المرحلة 2: إفلات الزر لفترة قصيرة
+    elif yy_stage == 2:
+        state['Y'] = 0
+        state['TRIANGLE'] = 0
+        if current_time - last_press_time >= 0.04:
+            yy_stage = 3
+            last_press_time = current_time
+
+    # المرحلة 3: ضغط Y الثانية
+    elif yy_stage == 3:
+        state['Y'] = 1
+        state['TRIANGLE'] = 1
+        if current_time - last_press_time >= 0.04:
+            yy_stage = 0  # العودة للمرحلة الأولى لإعادة الكرة طالما L3 مضغوط
 
     return state

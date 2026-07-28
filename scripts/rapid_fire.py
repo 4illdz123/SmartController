@@ -3,7 +3,7 @@
 import time
 
 # إعدادات الرابيد فاير
-FIRE_RATE = 20          # عدد الطلقات في الثانية (جرب من 10 إلى 20)
+FIRE_RATE = 10         # عدد الطلقات في الثانية (جرب من 10 إلى 20)
 last_shot_time = 0
 
 def process(state: dict) -> dict:
