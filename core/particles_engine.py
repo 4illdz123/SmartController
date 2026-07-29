@@ -1,47 +1,55 @@
 # core/particles_engine.py
+# Small solid cyan orbs - no blur
 
 import io
+import math
 import random
 import pygame
 
 
-class Particle:
+class SoftOrb:
+    def __init__(self, width, height):
+        self.x = random.uniform(0, max(1, width))
+        self.y = random.uniform(-height, 0)
+        self.radius = random.uniform(2.5, 5.5)   # small size
+        self.speed = random.uniform(0.4, 1.2)
+        self.drift = random.uniform(-0.2, 0.2)
+        self.phase = random.uniform(0, math.pi * 2)
+        self.wobble = random.uniform(0.003, 0.01)
+        self.color = (0, random.randint(200, 255), random.randint(220, 255))
 
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.vx = random.uniform(-1.5, 1.5)
-        self.vy = random.uniform(-1.5, 1.5)
-        self.size = random.uniform(3, 6)
-        self.life = random.randint(30, 80)
-        self.max_life = self.life
-        self.color = (
-            0,
-            random.randint(180, 255),
-            random.randint(220, 255),
-        )  # ألوان Cyan مضيئة
+    def update(self, width, height):
+        self.phase += self.wobble
+        self.y += self.speed
+        self.x += self.drift + math.sin(self.phase) * 0.25
 
-    def update(self):
-        self.x += self.vx
-        self.y += self.vy
-        self.size = max(0, self.size - 0.05)
-        self.life -= 1
+        if self.y - self.radius > height:
+            self.y = -self.radius * 2
+            self.x = random.uniform(0, max(1, width))
+            self.speed = random.uniform(0.4, 1.2)
+            self.radius = random.uniform(2.5, 5.5)
+
+        if self.x < -10:
+            self.x = width + 10
+        elif self.x > width + 10:
+            self.x = -10
 
     def draw(self, surface):
-        if self.life > 0 and self.size > 0:
-            pygame.draw.circle(
-                surface, self.color, (int(self.x), int(self.y)), int(self.size)
-            )
+        pygame.draw.circle(
+            surface,
+            self.color,
+            (int(self.x), int(self.y)),
+            max(1, int(self.radius)),
+        )
 
 
 class PygameEngine:
-
-    def __init__(self, width=980, height=760):
+    def __init__(self, width=720, height=520):
         pygame.init()
-        self.width = int(width) if width and width > 0 else 980
-        self.height = int(height) if height and height > 0 else 760
+        self.width = max(100, int(width))
+        self.height = max(100, int(height))
         self.surface = pygame.Surface((self.width, self.height))
-        self.particles = []
+        self.orbs = [SoftOrb(self.width, self.height) for _ in range(22)]
 
     def resize(self, width, height):
         if width and height and width > 0 and height > 0:
@@ -49,25 +57,12 @@ class PygameEngine:
             self.height = int(height)
             self.surface = pygame.Surface((self.width, self.height))
 
-    def add_particles(self, x, y):
-        for _ in range(3):
-            self.particles.append(Particle(x, y))
-
     def render_frame_bytes(self):
-        self.surface.fill((10, 10, 10))  # خلفية داكنة
+        self.surface.fill((8, 10, 14))
 
-        # توليد جسيمات عشوائية مستمرة خلف الواجهة
-        if random.random() < 0.4:
-            rx = random.randint(0, self.width)
-            ry = random.randint(0, self.height)
-            self.particles.append(Particle(rx, ry))
-
-        # تحديث ورسم الجسيمات
-        for p in self.particles[:]:
-            p.update()
-            p.draw(self.surface)
-            if p.life <= 0 or p.size <= 0:
-                self.particles.remove(p)
+        for orb in self.orbs:
+            orb.update(self.width, self.height)
+            orb.draw(self.surface)
 
         buffer = io.BytesIO()
         pygame.image.save(self.surface, buffer, "PNG")
