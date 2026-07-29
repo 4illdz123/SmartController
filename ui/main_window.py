@@ -74,7 +74,7 @@ class App:
                     ft.ProgressRing(color=ft.Colors.CYAN_400, width=30, height=30),
                     ft.Container(height=45),
                     ft.Text("Credits", size=12, color=ft.Colors.GREY_600),
-                    ft.Text("DevLoop  •  4ill  •  Assist DS64", size=13, color=ft.Colors.CYAN_700),
+                    ft.Text("DevLoop  •  4ill  •  Assist in ai DS64", size=13, color=ft.Colors.CYAN_700),
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 alignment=ft.MainAxisAlignment.CENTER,
