@@ -10,8 +10,6 @@ import threading
 import time
 import os
 
-ft.alignment.center = ft.Alignment(0, 0) if hasattr(ft, "alignment") else None
-
 class App:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -50,7 +48,7 @@ class App:
             height=height,
             bgcolor="#1f1f1f",
             border_radius=8,
-            alignment=ft.Alignment(0, 0),
+            alignment=ft.Alignment.CENTER,
             border=ft.Border(
                 left=ft.BorderSide(1, "#333"),
                 right=ft.BorderSide(1, "#333"),
@@ -67,7 +65,7 @@ class App:
             visible=True,
             expand=True,
             bgcolor="#0a0a0a",
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment.CENTER,
             content=ft.Column(
                 [
                     ft.Text("DualSenseX Pro", size=44, weight=ft.FontWeight.BOLD, color=ft.Colors.CYAN_400),
@@ -197,7 +195,7 @@ class App:
                     ft.Container(
                         content=ft.Text("BETA", size=11, weight=ft.FontWeight.BOLD, color=ft.Colors.CYAN_200),
                         bgcolor="#0e3a3a",
-                        padding=ft.padding.symmetric(6, 10),
+                        padding=ft.Padding.symmetric(vertical=6, horizontal=10),
                         border_radius=20,
                     ),
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
