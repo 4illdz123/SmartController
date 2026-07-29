@@ -65,16 +65,16 @@ class App:
 
     def _beta_badge(self):
         return ft.Container(
-            content=ft.Text(
-                "BETA",
-                size=10,
-                weight=ft.FontWeight.BOLD,
-                color=ft.Colors.CYAN_100,
-            ),
-            bgcolor="#0e3a3a",
-            padding=ft.padding.symmetric(horizontal=8, vertical=3),
-            border_radius=20,
-        )
+        content=ft.Text(
+            "BETA",
+            size=10,
+            weight=ft.FontWeight.BOLD,
+            color=ft.Colors.CYAN_100,
+        ),
+        bgcolor="#0e3a3a",
+        padding=ft.Padding.symmetric(horizontal=8, vertical=3),
+        border_radius=20,
+    )
 
     def build_ui(self):
         self.bg_image = ft.Image(src="", expand=True)
